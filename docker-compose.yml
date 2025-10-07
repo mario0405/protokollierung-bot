@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: protokoll_backend
+    environment:
+      - LLM_API_URL=http://llm:11434/api/generate
+      - UPLOAD_DIR=/app/data/input
+      - OUTPUT_DIR=/app/data/output
+    volumes:
+      - ./data:/app/data
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - llm
+    networks:
+      - app-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: protokoll_frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # LLM Service (Ollama)
+  llm:
+    image: ollama/ollama:latest
+    container_name: protokoll_llm
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
