@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log*
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Data files (don't commit uploaded documents)
+data/input/*
+data/output/*
+!data/input/.gitkeep
+!data/output/.gitkeep
+*.docx
+*.xlsx
+
+# IDEs
+.vscode/
+.DS_Store
+
+# Docker
+*.log
+
+# Models (large files)
+models/
+*.bin
