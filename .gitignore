@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -9,24 +9,21 @@ ENV/
 env/
 .venv
 *.egg-info/
+protocolito.db
 
 # Node
 node_modules/
 npm-debug.log*
 dist/
 build/
+.next/
 
 # Environment variables
 .env
 .env.local
 
-# Data files (don't commit uploaded documents)
-data/input/*
-data/output/*
-!data/input/.gitkeep
-!data/output/.gitkeep
-*.docx
-*.xlsx
+# Storage
+storage/
 
 # IDEs
 .vscode/
@@ -38,3 +35,4 @@ data/output/*
 # Models (large files)
 models/
 *.bin
+

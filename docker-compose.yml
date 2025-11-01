@@ -1,55 +1,53 @@
-version: '3.8'
-
 services:
-  # Backend API Service
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: protokoll_backend
+  db:
+    image: postgres:16-alpine
+    container_name: protocolito-db
     environment:
-      - LLM_API_URL=http://llm:11434/api/generate
-      - UPLOAD_DIR=/app/data/input
-      - OUTPUT_DIR=/app/data/output
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: protocolito
     volumes:
-      - ./data:/app/data
-      - ./backend:/app
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./backend
+    container_name: protocolito-api
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/protocolito
+      STORAGE_DIR: /data/storage
+      OLLAMA_HOST: http://ollama:11434
+      WHISPER_MODEL: base
+      SUMMARY_MODEL: llama3
+    volumes:
+      - storage_data:/data/storage
     ports:
       - "8000:8000"
     depends_on:
-      - llm
-    networks:
-      - app-network
+      - db
+      - ollama
 
-  # Frontend Service
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: protokoll_frontend
+  web:
+    build: ./frontend
+    container_name: protocolito-web
     environment:
-      - VITE_API_URL=http://localhost:8000
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+      NEXT_PUBLIC_WS_BASE: ws://localhost:8000
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
-      - backend
-    networks:
-      - app-network
+      - api
 
-  # LLM Service (Ollama)
-  llm:
+  ollama:
     image: ollama/ollama:latest
-    container_name: protokoll_llm
+    container_name: protocolito-ollama
+    ports:
+      - "${OLLAMA_HOST_PORT:-11535}:11434"
     volumes:
       - ollama_data:/root/.ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
+  db_data:
+  storage_data:
   ollama_data:
